@@ -51,9 +51,10 @@ extension UIView {
 
     /// Pins a view's edges to the view's supervieww
     @discardableResult
-    public func pinEdgesToContainer(safeArea: SafeArea = [])
+    public func pinEdgesToContainer(safeArea: SafeArea = [], insets: UIEdgeInsets = .zero)
         -> (top: NSLayoutConstraint, bottom: NSLayoutConstraint, leading: NSLayoutConstraint,
-            trailing: NSLayoutConstraint)? {
+        trailing: NSLayoutConstraint)?
+    {
         guard let superview = self.superview else {
             return nil
         }
@@ -76,10 +77,27 @@ extension UIView {
             superBottom = superview.safeAreaLayoutGuide.bottomAnchor
         }
 
-        let leading = leadingAnchor.constraint(equalTo: superLeading)
-        let trailing = trailingAnchor.constraint(equalTo: superTrailing)
-        let top = topAnchor.constraint(equalTo: superTop)
-        let bottom = bottomAnchor.constraint(equalTo: superBottom)
+        let leading = leadingAnchor.constraint(equalTo: superLeading, constant: insets.left)
+        let trailing = trailingAnchor.constraint(equalTo: superTrailing, constant: -insets.right)
+        let top = topAnchor.constraint(equalTo: superTop, constant: insets.top)
+        let bottom = bottomAnchor.constraint(equalTo: superBottom, constant: -insets.bottom)
+
+        let constraints = [leading, trailing, top, bottom]
+        NSLayoutConstraint.activate(constraints)
+
+        return (top, bottom, leading, trailing)
+    }
+
+    /// Pins a view's edges to the layout guide
+    @discardableResult
+    public func pinEdgesToLayoutGuide(layoutGuide: UILayoutGuide)
+        -> (top: NSLayoutConstraint, bottom: NSLayoutConstraint, leading: NSLayoutConstraint,
+            trailing: NSLayoutConstraint)?
+    {
+        let leading = leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor)
+        let trailing = trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor)
+        let top = topAnchor.constraint(equalTo: layoutGuide.topAnchor)
+        let bottom = bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor)
 
         let constraints = [leading, trailing, top, bottom]
         NSLayoutConstraint.activate(constraints)

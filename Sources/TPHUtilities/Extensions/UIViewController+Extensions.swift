@@ -12,18 +12,25 @@ extension UIViewController {
     /// - Parameters:
     ///   - viewController: The view controller to add
     ///   - containerView: The container view to add the view controller's view to
-    public func addChild(_ viewController: UIViewController, containerView: UIView,
+    ///   - layoutGuide: The layout guide to align the child's view to, if that kind of alignment is desired
+    ///   - insets: An amount to inset the child by, if desired
+    public func addChild(_ viewController: UIViewController, containerView: UIView, layoutGuide: UILayoutGuide? = nil,
                          insets: UIEdgeInsets = .zero) {
         addChild(viewController)
 
         containerView.addSubview(viewController.view)
         viewController.view.translatesAutoresizingMaskIntoConstraints = false
+
+        let leading = layoutGuide?.leadingAnchor ?? containerView.leadingAnchor
+        let trailing = layoutGuide?.trailingAnchor ?? containerView.trailingAnchor
+        let top = layoutGuide?.topAnchor ?? containerView.topAnchor
+        let bottom = layoutGuide?.bottomAnchor ?? containerView.bottomAnchor
+
         NSLayoutConstraint.activate([
-            viewController.view.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: insets.left),
-            viewController.view.trailingAnchor
-                .constraint(equalTo: containerView.trailingAnchor, constant: -insets.right),
-            viewController.view.topAnchor.constraint(equalTo: containerView.topAnchor, constant: insets.top),
-            viewController.view.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -insets.bottom),
+            viewController.view.leadingAnchor.constraint(equalTo: leading, constant: insets.left),
+            viewController.view.trailingAnchor.constraint(equalTo: trailing, constant: -insets.right),
+            viewController.view.topAnchor.constraint(equalTo: top, constant: insets.top),
+            viewController.view.bottomAnchor.constraint(equalTo: bottom, constant: -insets.bottom),
         ])
     }
 
@@ -55,9 +62,13 @@ extension UIViewController {
 
     /// Presents an alert controller with an OK button and the localized text of the given error.
     /// - Parameter error: The error to present.
-    public func presentError(_ error: Error) {
+    public func presentError(_ error: Error, additionalActions actions: [UIAlertAction] = []) {
         let alertVC = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
         alertVC.addAction(ok)
+
+        actions.forEach({ $0.addingTo(alertVC) })
+
+        present(alertVC, animated: true, completion: nil)
     }
 }

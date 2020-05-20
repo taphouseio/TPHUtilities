@@ -45,6 +45,8 @@ public final class ActivityHUD: UIView {
     }
 
     public func hide() {
-        removeFromSuperview()
+        DispatchQueue.main.async {
+            self.removeFromSuperview()
+        }
     }
 }
